@@ -2,7 +2,7 @@
 
 1. Configuracion: Implementar un archivo de configuracion parametrizable
 2. Conecciones/Sesiones : 
-  i. Pool de conecciones
+    1. Pool de conecciones
 3. find
 4. Query
 5. Update
