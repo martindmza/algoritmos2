@@ -24,13 +24,6 @@ public class Utn
 	{
 		return null;
 	}
-	
-	// Retorna: una todasa las filas de la tabla representada por dtoClass
-	// Invoca a: query
-	private static <T> List<T> findAll(Connection con, Class<T> dtoClass)
-	{
-		return null;
-	}
 
 	// Retorna: el SQL correspondiente a la clase dtoClass acotado por xql
 	public static <T> String _update(Class<T> dtoClass, String xql)

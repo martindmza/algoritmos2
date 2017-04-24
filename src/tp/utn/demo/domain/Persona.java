@@ -3,12 +3,12 @@ package tp.utn.demo.domain;
 import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Table;
-@Table(name="persona")
+@Table(name="persona",alias="p")
 public class Persona
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_persona")
-	private Integer idPersona;
+	@Column(name="id")
+	private Integer id;
 	
 	@Column(name="nombre")
 	private String nombre;
@@ -19,14 +19,14 @@ public class Persona
 	@Column(name="id_ocupacion")
 	public Ocupacion ocupacion;
 
-	public Integer getIdPersona()
+	public Integer getId()
 	{
-		return idPersona;
+		return id;
 	}
 
-	public void setIdPersona(Integer idPersona)
+	public void setId(Integer idPersona)
 	{
-		this.idPersona=idPersona;
+		this.id=idPersona;
 	}
 
 	public String getNombre()
@@ -62,7 +62,7 @@ public class Persona
 	@Override
 	public String toString()
 	{
-		return "Persona [idPersona="+idPersona+", nombre="+nombre+", direccion="+direccion+", ocupacion="+ocupacion+"]";
+		return "Persona [idPersona="+ id +", nombre="+nombre+", direccion="+direccion+", ocupacion="+ocupacion+"]";
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class Persona
 	{
 		Persona other = (Persona)o;
 		boolean ok = true;
-		ok = ok && idPersona==other.getIdPersona();
+		ok = ok && id==other.getId();
 		ok = ok && nombre.equals(other.getNombre());
 
 		if( direccion!=null )
