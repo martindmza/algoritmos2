@@ -25,30 +25,24 @@ public class FindAll {
 		String tableName = table.name();
 		
 		//obtengo los atributos que son columnas de la tabla usando la anotation @Column
+		List<MyField> classFields = new ArrayList<MyField>();
 		String tableFields = "";
 		for (Field f: dtoClass.getDeclaredFields()) {
 			   Column column = f.getAnnotation(Column.class);
 			   if (column != null) {
 				   tableFields += column.name() + "," ;
+				   classFields.add(new MyField(f,column.name(),dtoClass));
 			   }
 		}
 		tableFields = tableFields.substring(0, tableFields.length()-1);
 		
-		//obtengo los metodos setters de la clase para usarlos por cada columna de las filas obtenidas de la base de datos
-		Method methods[] = dtoClass.getDeclaredMethods();
-		List<Method> setters = new ArrayList<Method>();
-		for(Method method: methods) {
-			if (method.getName().startsWith("set")) {
-				setters.add(method);
-			}
-		}
 		
 		//armo el string sql
 		String sql = "SELECT " + tableFields + " FROM " + tableName + ";";
 		
 		
 		//ejecuto el comando sql
-		List<Persona> result = new ArrayList<Persona>();
+		List<T> result = new ArrayList<T>();
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
 		try {
@@ -58,14 +52,12 @@ public class FindAll {
 			//construyo un objeto de la clase Persona por cada fila encontrada
 			Constructor ctor = dtoClass.getConstructor();
 			while( rs.next() ) {
-				for (Method setter : setters) {
-					//TODO invocar los setters dinamicamente
+				T obj = (T) ctor.newInstance();
+				for (MyField myField : classFields ) {
+					
 				}
-				Object obj = ctor.newInstance();
-				Persona p = (Persona) obj;
-				p.setId(rs.getInt("id"));
-				p.setNombre(rs.getString("nombre"));
-				result.add(p);
+
+				//result.add(p);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
