@@ -1,4 +1,4 @@
-package tp.utn.demo.domain;
+package client.utn.domain;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.Id;
@@ -11,13 +11,13 @@ public class Persona
 	@Id(strategy=Id.IDENTITY)
 	@Column(name="id")
 	private Integer id;
-	
+
 	@Column(name="nombre")
 	private String nombre;
-		
+
 	@ManyToOne(type=Direccion.class, name="direccion_id")
 	public Direccion direccion;
-	
+
 	@ManyToOne(type=Ocupacion.class, name="ocupacion_id")
 	public Ocupacion ocupacion;
 

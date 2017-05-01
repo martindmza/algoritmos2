@@ -1,4 +1,4 @@
-package tp.utn.demo.domain;
+package client.utn.domain;
 
 import java.util.Collection;
 

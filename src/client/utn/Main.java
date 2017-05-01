@@ -4,8 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import tp.utn.FindAll;
-import tp.utn.demo.domain.Persona;
+
+import client.utn.domain.Persona;
+import tp.utn.methods.FindAll;
 
 public class Main {
 

@@ -4,8 +4,9 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import tp.utn.Find;
+
 import tp.utn.ann.ManyToOne;
+import tp.utn.methods.Find;
 
 public class ManyToOneField extends AbstractField {
 

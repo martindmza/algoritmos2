@@ -1,4 +1,4 @@
-package tp.utn;
+package tp.utn.methods;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,11 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import tp.utn.ann.Column;
-import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
 import tp.utn.fieldstypes.AbstractField;
-import tp.utn.fieldstypes.ManyToOneField;
+import tp.utn.fieldstypes.FieldsTypesFactory;
 import tp.utn.fieldstypes.PrimitiveField;
 
 public class Utn {
@@ -37,21 +35,21 @@ public class Utn {
 		if (!xql.trim().equals("")) {
 			where = "WHERE " + xql;
 		}
-
-		return "SELECT * FROM " + tableName + " " + where + ";";
+		
+		String sql =  "SELECT * FROM " + tableName + " " + where + ";";
+		System.out.println(sql);
+		return sql;
 	}
 
 	// Invoca a: _query para obtener el SQL que se debe ejecutar
 	// Retorna: una lista de objetos de tipo T
 	public static <T> List<T> query(Connection con, Class<T> dtoClass, String xql, Object... args) {
 		List<AbstractField> classFields = new ArrayList<AbstractField>();
+		PrimitiveField idAttribute = FieldsTypesFactory.getIdAttribute(dtoClass);
 		for (Field f : dtoClass.getDeclaredFields()) {
-			if (f.getAnnotation(Column.class) != null) {
-				Column column = f.getAnnotation(Column.class);
-				classFields.add(new PrimitiveField(f, column.name(), dtoClass));
-			} else if (f.getAnnotation(ManyToOne.class) != null) {
-				ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
-				classFields.add(new ManyToOneField(f, manyToOneColumn.name(), dtoClass));
+			AbstractField field = FieldsTypesFactory.buildfieldType(f, dtoClass);
+			if (field != null) {
+				classFields.add(field);
 			}
 		}
 
@@ -67,6 +65,8 @@ public class Utn {
 			Constructor ctor = dtoClass.getConstructor();
 			while (rs.next()) {
 				T entity = (T) ctor.newInstance();
+				Object id =  idAttribute.getGetter().invoke(entity);
+				
 				for (AbstractField myField : classFields) {
 					if (myField.getSetter() != null) {
 						myField.getSetter().invoke(entity, myField.getParamForSetter(rs, con));

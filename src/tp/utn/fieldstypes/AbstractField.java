@@ -6,9 +6,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import tp.utn.Find;
+import tp.utn.ann.Column;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
+import tp.utn.methods.Find;
 
 public abstract class AbstractField {
 
@@ -16,11 +17,12 @@ public abstract class AbstractField {
 	protected String columnName;
 	protected Method setter;
 	protected Method getter;
+	protected String tableName;
 
 	public <T> AbstractField(Field attribute, String columnName, Class<T> dtoClass) {
-
 		this.attribute = attribute;
 		this.columnName = columnName;
+		this.tableName = dtoClass.getAnnotation(Table.class).name();
 
 		Method methods[] = dtoClass.getDeclaredMethods();
 
