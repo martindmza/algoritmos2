@@ -2,7 +2,9 @@ package tp.utn.demo.domain;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.Id;
+import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
+
 @Table(name="persona",alias="p")
 public class Persona
 {
@@ -13,10 +15,10 @@ public class Persona
 	@Column(name="nombre")
 	private String nombre;
 		
-	@Column(name="id_direccion")
+	@ManyToOne(type=Direccion.class, name="direccion_id")
 	public Direccion direccion;
 	
-	@Column(name="id_ocupacion")
+	@ManyToOne(type=Ocupacion.class, name="ocupacion_id")
 	public Ocupacion ocupacion;
 
 	public Integer getId()

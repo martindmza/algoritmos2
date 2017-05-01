@@ -6,20 +6,20 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
-@Table(name="direccion")
+@Table(name="direcciones")
 public class Direccion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_direccion")
+	@Column(name="id")
 	private Integer idDireccion;
 
 	@Column(name="calle")
 	private String calle;
 
 	@Column(name="numero")
-	private int numero;
+	private Integer numero;
 	
-	@Relation(type=Persona.class,att="direccion")
+	//@Relation(type=Persona.class,att="direccion")
 	private Collection<Persona> personas;
 
 	public Collection<Persona> getPersonas()

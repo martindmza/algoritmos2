@@ -14,7 +14,7 @@ public class Main {
 		String usr = "root";
 		String pwd = "root";
 		String driver = "com.mysql.jdbc.Driver";
-		String url = "jdbc:mysql://localhost:3306/algoritmos";
+		String url = "jdbc:mysql://localhost:3306/algoritmos";	
 		
 		Connection con = null;
 		try {
@@ -22,8 +22,7 @@ public class Main {
 			con = DriverManager.getConnection(url,usr,pwd);
 			
 			for (Persona p : FindAll.findAll(con, Persona.class)) {
-				String print =  p.getId() + " - " + p.getNombre();
-				System.out.println(print);
+				System.out.println(p);
 			}
 			
 			
@@ -45,7 +44,4 @@ public class Main {
 				}
 			}
 		}
-		
-
-		
 }

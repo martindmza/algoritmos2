@@ -4,17 +4,17 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Table;
 
-@Table(name="ocupacion")
+@Table(name="ocupaciones")
 public class Ocupacion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_ocupacion")
+	@Column(name="id")
 	private Integer idOcupacion;
 	
 	@Column(name="descripcion")
 	private String descripcion;
 	
-	@Column(name="id_tipoocupacion")
+	//@Column(name="id_tipoocupacion")
 	public TipoOcupacion tipoOcupacion;
 	
 	public Integer getIdOcupacion()
