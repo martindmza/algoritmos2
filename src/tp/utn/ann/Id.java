@@ -13,5 +13,5 @@ public @interface Id
 	int IDENTITY=0;
 	int ASSIGNED=1;
 
-	int strategy();
+	public int strategy();
 }

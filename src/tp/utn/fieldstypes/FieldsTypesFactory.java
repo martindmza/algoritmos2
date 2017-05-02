@@ -34,4 +34,12 @@ public class FieldsTypesFactory {
 		}
 		return null;
 	}
+
+	public static <T> PrimitiveField buildPrimitiveField(Field f, Class<T> dtoClass) {
+		if (f.getAnnotation(Column.class) != null) {
+			Column column = f.getAnnotation(Column.class);
+			return new PrimitiveField(f, column.name(), dtoClass);
+		}
+		return null;
+	}
 }

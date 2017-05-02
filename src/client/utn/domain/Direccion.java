@@ -21,6 +21,13 @@ public class Direccion
 	
 	//@Relation(type=Persona.class,att="direccion")
 	private Collection<Persona> personas;
+	
+	public Direccion () {}
+	
+	public Direccion (String calle, Integer numero) {
+		this.calle = calle;
+		this.numero = numero;
+	}
 
 	public Collection<Persona> getPersonas()
 	{
@@ -65,7 +72,7 @@ public class Direccion
 	@Override
 	public String toString()
 	{
-		return getCalle()+" "+getNumero();
+		return getIdDireccion() + " " + getCalle() + " " + getNumero();
 	}
 
 	@Override
