@@ -10,6 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mysql.jdbc.JDBC4PreparedStatement;
+
 import tp.utn.ann.Column;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
@@ -64,8 +67,23 @@ public class Utn {
 		ResultSet rs = null;
 		try {
 			pstm = con.prepareStatement(sql);
+			int count = 1;
+			for (Object arg : args) {
+				if (arg instanceof Integer) {
+					pstm.setInt(count, (int) arg);
+				} else if (arg instanceof Boolean) {
+					pstm.setBoolean(count, (boolean) arg);
+				} else if (arg instanceof Date) {
+					pstm.setDate(count, (Date) arg);
+				} else {
+					pstm.setString(count, arg.toString());
+				}
+				count++;
+			}
+			
 			rs = pstm.executeQuery();
-
+			System.out.println(((JDBC4PreparedStatement)pstm).asSql());
+			
 			Constructor ctor = dtoClass.getConstructor();
 			while (rs.next()) {
 				T entity = (T) ctor.newInstance();

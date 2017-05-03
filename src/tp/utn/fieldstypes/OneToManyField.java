@@ -5,21 +5,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import tp.utn.ann.OneToMany;
 import tp.utn.ann.Table;
+import tp.utn.methods.Utn;
 
 public class OneToManyField extends AbstractField {
 	
-	protected String relatedTableName;
-	protected PrimitiveField id;
-	protected PrimitiveField joinedId;
+	protected Class<?> relatedClass;
+	protected String joinColumn;
+	protected PrimitiveField idField;
 
-	public <T> OneToManyField(Field attribute, Class<T> dtoClass, Class<?> relatedClass, PrimitiveField id, PrimitiveField joinedId) {
+	public <T> OneToManyField(Field attribute, Class<T> dtoClass, Class<?> relatedClass, PrimitiveField idField, String joinColumn) {
 		super(attribute, "", dtoClass);
-		this.relatedTableName = relatedClass.getAnnotation(Table.class).name();
-		this.id = id;
-		this.joinedId = joinedId;
+		this.relatedClass = relatedClass;
+		this.idField = idField;
+		this.joinColumn = joinColumn;
 	}
 
 
@@ -27,28 +30,14 @@ public class OneToManyField extends AbstractField {
 	public Object getParamForSetter(ResultSet rs, Connection con) throws SQLException {
 		OneToMany oneToMany = this.attribute.getAnnotation(OneToMany.class);
 		
-		String middleTableName = this.tableName + "_" + relatedTableName;
-		String thisIdField =  this.tableName + "_id";
-		String joinedIdField = this.relatedTableName + "_id";
-		String sql = "SELECT * FROM " + middleTableName + " WHERE " + thisIdField + " = " ;
+		String xql = joinColumn + " = ?";
+		int thisObjectId = rs.getInt(this.idField.columnName);
 		
-		PreparedStatement pstm = null;
-		ResultSet rs2 = null;
-		try {
-			pstm = con.prepareStatement(sql);
-			rs2 = pstm.executeQuery();
-			while (rs2.next()) {
-				int thisId = rs2.getInt(this.columnName);
-				int joinedId = rs2.getInt(this.columnName);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		List<Object> resultSet = new ArrayList<Object>();
+		for (Object result : Utn.query(con, relatedClass, xql, thisObjectId)) {
+			resultSet.add(result);
 		}
 		
-		return null;
+		return resultSet;
 	}
 }

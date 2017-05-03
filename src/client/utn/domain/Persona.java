@@ -5,7 +5,7 @@ import tp.utn.ann.Id;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
 
-@Table(name="persona",alias="p")
+@Table(name="personas",alias="p")
 public class Persona
 {
 	@Id(strategy=Id.IDENTITY)

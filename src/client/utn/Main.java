@@ -4,9 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import client.utn.domain.Departamento;
 import client.utn.domain.Direccion;
+import client.utn.domain.Persona;
 import tp.utn.methods.Delete;
+import tp.utn.methods.Find;
+import tp.utn.methods.FindAll;
 import tp.utn.methods.Insert;
+import tp.utn.methods.Utn;
 
 public class Main {
 
@@ -22,10 +27,25 @@ public class Main {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, usr, pwd);
 
+			//findAll ---
+			for (Departamento p : FindAll.findAll(con, Departamento.class)) {
+				System.out.println(p);
+			}
+			
+			System.exit(1);
+			
+			for (Persona p : FindAll.findAll(con, Persona.class)) {
+				System.out.println(p);
+			}
+			
 			//find ---
-			// for (Persona p : FindAll.findAll(con, Persona.class)) {
-			// System.out.println(p);
-			// }
+			Persona p2 = Find.find(con, Persona.class, 2);
+			System.out.println(p2);
+			
+			//query ---
+			for (Persona p : Utn.query(con, Persona.class, "nombre LIKE '%a%'", args)) {
+				System.out.println(p + " encontrado con query");
+			}
 
 			//insert ---
 			Direccion nueva = new Direccion("Rivadavia", 700);

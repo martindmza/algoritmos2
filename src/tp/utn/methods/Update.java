@@ -22,22 +22,16 @@ import tp.utn.fieldstypes.PrimitiveField;
 public class Update extends Utn {
 	
 	// Retorna: el SQL correspondiente a la clase dtoClass acotado por xql
-	public static <T> String _update(Class<T> dtoClass, String xql, Object... args) {
+	public static <T> String _update(Class<T> dtoClass, String setsXql, String whereXql) {
 		Table table = dtoClass.getAnnotation(Table.class);
 		String tableName = table.name();
 
 		String where = "";
-		if (!xql.trim().equals("") && xql != null) {
-			where = "WHERE " + xql;
+		if (!whereXql.trim().equals("") && whereXql != null) {
+			where = "WHERE " + whereXql;
 		}
-		
-		String sets = "";
-		for (Object arg : args) {
-			sets += " ?, ";
-		}
-		sets = sets.substring(0, sets.length() - 1);
 
-		String sql = "UPDATE " + tableName + " SET " + sets + " " + where + " ;";
+		String sql = "UPDATE " + tableName + " SET " + setsXql + " " + where + " ;";
 		System.out.println(sql);
 
 		return null;
@@ -45,8 +39,27 @@ public class Update extends Utn {
 
 	// Invoca a: _update para obtener el SQL que se debe ejecutar
 	// Retorna: la cantidad de filas afectadas luego de ejecutar el SQL
-	public static int update(Connection con, Class<?> dtoClass, String xql, Object... args) {
-		return 0;
+	public static int update(Connection con, Class<?> dtoClass, String sets, String where, Object... args) throws SQLException {
+		String sql = _update(dtoClass, sets, where);
+		
+		PreparedStatement pstm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		int count = 2;
+		for (Object arg : args) {
+			if (arg instanceof Integer) {
+				pstm.setInt(count, (int) arg);
+			} else if (arg instanceof Boolean) {
+				pstm.setBoolean(count, (boolean) arg);
+			} else if (arg instanceof Date) {
+				pstm.setDate(count, (Date) arg);
+			} else {
+				pstm.setString(count, arg.toString());
+			}
+			count++;
+		}
+		
+		System.out.println(((JDBC4PreparedStatement)pstm).asSql());
+		int result = pstm.executeUpdate();
+		return result;
 	}
 
 	// Invoca a: update
@@ -62,14 +75,18 @@ public class Update extends Utn {
 			}
 		}
 		
-		String sql = _update(dto.getClass(), " id + ? ", classFields );
+		String sets = "";
+		for (AbstractField arg : classFields) {
+			sets +=  arg.getColumnName() + " = ?, ";
+		}
+		sets = sets.substring(0, sets.length() - 1);
 		
+		String sql = _update(dto.getClass(), sets, " id = ? ");
 		PrimitiveField idAttribute = FieldsTypesFactory.getIdAttribute(dto.getClass());
 		Integer id = (int) idAttribute.getGetter().invoke(dto);
 		
 		PreparedStatement pstm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		pstm.setInt(1, id);
-		
 		int count = 2;
 		for (AbstractField f : classFields) {
 			String type = f.getAttribute().getType().getSimpleName();

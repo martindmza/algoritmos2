@@ -1,10 +1,12 @@
 package client.utn.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.Gui;
 import tp.utn.ann.Id;
+import tp.utn.ann.JoinColumn;
 import tp.utn.ann.OneToMany;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
@@ -23,7 +25,8 @@ public class Departamento {
 	private String localidad;
 
 	@OneToMany(type = Persona.class, att = "departamento")
-	private List<Persona> personas;
+	@JoinColumn(name="departamento_id")
+	private List<Persona> personas = new ArrayList<Persona>();
 
 	public Integer getId() {
 		return id;
@@ -51,15 +54,19 @@ public class Departamento {
 
 	@Override
 	public String toString() {
-		return getNombre();
+		String personas = "";
+		for (Persona p: this.personas) {
+			personas += " " + p.getNombre() + " ";
+		}
+		return getNombre() + "-> Personas: " + personas ;
 	}
 
 	public List<Persona> getPersonas() {
 		return personas;
 	}
 
-	public void setPersonas(List<Persona> emps) {
-		this.personas = emps;
+	public void setPersonas(List<Persona> personas) {
+		this.personas = personas;
 	}
 
 	public boolean equals(Object o) {

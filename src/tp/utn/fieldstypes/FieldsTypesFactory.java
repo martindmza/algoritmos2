@@ -2,6 +2,7 @@ package tp.utn.fieldstypes;
 
 import java.lang.reflect.Field;
 import tp.utn.ann.Id;
+import tp.utn.ann.JoinColumn;
 import tp.utn.ann.Column;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.OneToMany;
@@ -17,9 +18,9 @@ public class FieldsTypesFactory {
 			return new ManyToOneField(f, manyToOneAttr.name(), dtoClass);
 		} else if (f.getAnnotation(OneToMany.class) != null) {
 			OneToMany oneToManyAttr = f.getAnnotation(OneToMany.class);
-			PrimitiveField id = getIdAttribute(dtoClass);
-			PrimitiveField joinedId = getIdAttribute(oneToManyAttr.type());
-			return new OneToManyField(f, dtoClass, oneToManyAttr.type(), id, joinedId);
+			JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);
+			String joinColumnName = joinColumn.name(); 
+			return new OneToManyField(f, dtoClass, oneToManyAttr.type(), getIdAttribute(dtoClass), joinColumnName);
 		}
 		return null;
 	}
