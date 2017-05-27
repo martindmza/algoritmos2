@@ -4,31 +4,30 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
-
-@Table(name="personas",alias="p")
+@Table(name="persona", alias = "p")
 public class Persona
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id")
-	private Integer id;
-
+	@Column(name="id_persona")
+	private Integer idPersona;
+	
 	@Column(name="nombre")
 	private String nombre;
-
-	@ManyToOne(type=Direccion.class, name="direccion_id")
+		
+	@ManyToOne(type=Direccion.class, name="id_direccion")
 	public Direccion direccion;
-
-	@ManyToOne(type=Ocupacion.class, name="ocupacion_id")
+	
+	@ManyToOne(type=Ocupacion.class, name="id_ocupacion")
 	public Ocupacion ocupacion;
 
-	public Integer getId()
+	public Integer getIdPersona()
 	{
-		return id;
+		return idPersona;
 	}
 
-	public void setId(Integer idPersona)
+	public void setIdPersona(Integer idPersona)
 	{
-		this.id=idPersona;
+		this.idPersona=idPersona;
 	}
 
 	public String getNombre()
@@ -64,7 +63,7 @@ public class Persona
 	@Override
 	public String toString()
 	{
-		return "Persona [idPersona="+ id +", nombre="+nombre+", direccion="+direccion+", ocupacion="+ocupacion+"]";
+		return "Persona [idPersona="+idPersona+", nombre="+nombre+", direccion="+direccion+", ocupacion="+ocupacion+"]";
 	}
 	
 	@Override
@@ -72,7 +71,7 @@ public class Persona
 	{
 		Persona other = (Persona)o;
 		boolean ok = true;
-		ok = ok && id==other.getId();
+		ok = ok && idPersona==other.getIdPersona();
 		ok = ok && nombre.equals(other.getNombre());
 
 		if( direccion!=null )

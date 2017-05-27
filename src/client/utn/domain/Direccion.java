@@ -6,28 +6,21 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
-@Table(name="direcciones")
+@Table(name="direccion", alias="d")
 public class Direccion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id")
+	@Column(name="id_direccion")
 	private Integer idDireccion;
 
 	@Column(name="calle")
 	private String calle;
 
 	@Column(name="numero")
-	private Integer numero;
+	private int numero;
 	
-	//@Relation(type=Persona.class,att="direccion")
+	@Relation(type=Persona.class,att="direccion")
 	private Collection<Persona> personas;
-	
-	public Direccion () {}
-	
-	public Direccion (String calle, Integer numero) {
-		this.calle = calle;
-		this.numero = numero;
-	}
 
 	public Collection<Persona> getPersonas()
 	{
@@ -72,7 +65,7 @@ public class Direccion
 	@Override
 	public String toString()
 	{
-		return getIdDireccion() + " " + getCalle() + " " + getNumero();
+		return getCalle()+" "+getNumero();
 	}
 
 	@Override

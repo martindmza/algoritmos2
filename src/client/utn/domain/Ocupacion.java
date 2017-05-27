@@ -2,19 +2,20 @@ package client.utn.domain;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.Id;
+import tp.utn.ann.ManyToOne;
 import tp.utn.ann.Table;
 
-@Table(name="ocupaciones")
+@Table(name="ocupacion",alias="o")
 public class Ocupacion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id")
+	@Column(name="id_ocupacion")
 	private Integer idOcupacion;
 	
 	@Column(name="descripcion")
 	private String descripcion;
-	
-	//@Column(name="id_tipoocupacion")
+
+	@ManyToOne(type=TipoOcupacion.class, name="id_tipoocupacion")
 	public TipoOcupacion tipoOcupacion;
 	
 	public Integer getIdOcupacion()

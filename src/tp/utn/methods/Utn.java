@@ -2,7 +2,6 @@ package tp.utn.methods;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -15,42 +14,93 @@ import com.mysql.jdbc.JDBC4PreparedStatement;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.ManyToOne;
+import tp.utn.ann.OneToMany;
 import tp.utn.ann.Table;
-import tp.utn.ann.Id;
 import tp.utn.fieldstypes.AbstractField;
 import tp.utn.fieldstypes.FieldsTypesFactory;
 import tp.utn.fieldstypes.PrimitiveField;
 
 public class Utn {
+	
+	protected static <T,R> String join(Class<T> dtoClass, Class<R> dtoTargetClass, String targetTableAlias, String originId, String targetId) {
+		String alias = getAlias(dtoClass);
+		
+		Table targetTable = dtoTargetClass.getAnnotation(Table.class);
+		String targetTableName = targetTable.name();
+		
+		String join = 	"JOIN " + targetTableName + " AS " + targetTableAlias +
+						" ON " + alias + "." + originId + " = " + targetTableAlias + "." + targetId + " " ;
+		
+		for (Field f : dtoTargetClass.getDeclaredFields()) {
+			if (f.getAnnotation(ManyToOne.class) != null) {
+				ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
+				PrimitiveField subJoinTargetId = FieldsTypesFactory.getIdAttribute(manyToOneColumn.type());
+				String targetSubJoinAlias = getAlias(manyToOneColumn.type());
+				join += " " + join(dtoTargetClass, manyToOneColumn.type(), targetSubJoinAlias, manyToOneColumn.name(), subJoinTargetId.getColumnName());
+			}
+		}
+		
+		return join;
+	}
+	
+	protected static <T> String getClassFieldsNames(Class<T> dtoClass) {
+		String alias = getAlias(dtoClass);
+		String tableFields = "";
+		for (Field f : dtoClass.getDeclaredFields()) {
+			if (f.getAnnotation(Column.class) != null) {
+				Column column = f.getAnnotation(Column.class);
+				tableFields += alias + "." + column.name() + ",";
+			}
+		}
+		return tableFields;
+	}
 
 	// Retorna: el SQL correspondiente a la clase dtoClass acotado por xql
 	protected static <T> String _query(Class<T> dtoClass, String xql) {
 		Table table = dtoClass.getAnnotation(Table.class);
 		String tableName = table.name();
-		// String tableFields = "";
-		// for (Field f : dtoClass.getDeclaredFields()) {
-		// if (f.getAnnotation(Column.class) != null) {
-		// Column column = f.getAnnotation(Column.class);
-		// tableFields += column.name() + ",";
-		// } else if (f.getAnnotation(ManyToOne.class) != null) {
-		// ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
-		// tableFields += manyToOneColumn.name() + ", ";
-		// }
-		// }
-		// tableFields = tableFields.substring(0, tableFields.length() - 1);
+		String alias = getAlias(dtoClass);
+		
+		String tableFields = "";
+		String joins = "";
+		for (Field f : dtoClass.getDeclaredFields()) {
+			if (f.getAnnotation(Column.class) != null) {
+				Column column = f.getAnnotation(Column.class);
+				tableFields += alias + "." + column.name() + ",";
+			} else if (f.getAnnotation(ManyToOne.class) != null ) {
+				//join
+				ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
+				PrimitiveField targetId = FieldsTypesFactory.getIdAttribute(manyToOneColumn.type());
+				String targetAlias = getAlias(manyToOneColumn.type());
+				joins += " " + join(dtoClass, manyToOneColumn.type(), targetAlias, manyToOneColumn.name(), targetId.getColumnName());
+				
+				//select field
+				tableFields += getClassFieldsNames(manyToOneColumn.type());
+			} else if (f.getAnnotation(OneToMany.class) != null) {
+				//join
+				
+				//select field
+				
+			}
+			
+		}
+		tableFields = tableFields.substring(0, tableFields.length() - 1);
 		String where = "";
 		if (!xql.trim().equals("") && xql != null) {
 			where = "WHERE " + xql;
 		}
 
-		String sql = "SELECT * FROM " + tableName + " " + where + ";";
+		String sql = "SELECT " + tableFields + " FROM " + tableName + " AS " + alias + " " + joins + " " + where + ";";
 		System.out.println(sql);
+		System.exit(1);
 		return sql;
 	}
 
 	// Invoca a: _query para obtener el SQL que se debe ejecutar
 	// Retorna: una lista de objetos de tipo T
 	public static <T> List<T> query(Connection con, Class<T> dtoClass, String xql, Object... args) {
+		String sql = _query(dtoClass, xql);
+
 		List<AbstractField> classFields = new ArrayList<AbstractField>();
 		PrimitiveField idAttribute = FieldsTypesFactory.getIdAttribute(dtoClass);
 		for (Field f : dtoClass.getDeclaredFields()) {
@@ -59,8 +109,6 @@ public class Utn {
 				classFields.add(field);
 			}
 		}
-
-		String sql = _query(dtoClass, xql);
 
 		List<T> result = new ArrayList<T>();
 		PreparedStatement pstm = null;
@@ -80,10 +128,10 @@ public class Utn {
 				}
 				count++;
 			}
-			
+
 			rs = pstm.executeQuery();
-			System.out.println(((JDBC4PreparedStatement)pstm).asSql());
-			
+			System.out.println(((JDBC4PreparedStatement) pstm).asSql());
+
 			Constructor ctor = dtoClass.getConstructor();
 			while (rs.next()) {
 				T entity = (T) ctor.newInstance();
@@ -105,5 +153,16 @@ public class Utn {
 		}
 
 		return (List<T>) result;
+	}
+	
+	private static <T> String getAlias (Class<T> dtoClass) {
+		Table table = dtoClass.getAnnotation(Table.class);
+		String tableName = table.name();
+		String alias = table.alias();
+		if (alias.trim().equals("")) {
+			alias = tableName;
+		}
+		
+		return alias;
 	}
 }

@@ -3,14 +3,10 @@ package client.utn;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import client.utn.domain.Departamento;
-import client.utn.domain.Direccion;
+import client.utn.domain.Dept;
 import client.utn.domain.Persona;
-import tp.utn.methods.Delete;
 import tp.utn.methods.Find;
 import tp.utn.methods.FindAll;
-import tp.utn.methods.Insert;
 import tp.utn.methods.Utn;
 
 public class Main {
@@ -28,15 +24,11 @@ public class Main {
 			con = DriverManager.getConnection(url, usr, pwd);
 
 			//findAll ---
-			for (Departamento p : FindAll.findAll(con, Departamento.class)) {
+			for (Persona p : FindAll.findAll(con, Persona.class)) {
 				System.out.println(p);
 			}
 			
 			System.exit(1);
-			
-			for (Persona p : FindAll.findAll(con, Persona.class)) {
-				System.out.println(p);
-			}
 			
 			//find ---
 			Persona p2 = Find.find(con, Persona.class, 2);
@@ -47,30 +39,32 @@ public class Main {
 				System.out.println(p + " encontrado con query");
 			}
 
-			//insert ---
-			Direccion nueva = new Direccion("Rivadavia", 700);
-			int direccionId = Insert.insert(con, nueva);
-			System.out.println("Objeto creado : " + nueva);
 			
-			//delete por id---
-			int direccionBorrada = Delete.delete(con, Direccion.class, direccionId);
-			if (direccionBorrada == 0) {
-				System.out.println("Error: Objeto " + nueva + " no eliminado!!");
-			} else {
-				System.out.println("Objeto " + nueva + " eliminado");
-			}
-
-			//deletes por xql---
-			Insert.insert(con, new Direccion("Juan b Justo", 700));
-			Insert.insert(con, new Direccion("Juan b Justo", 1000));
-			Insert.insert(con, new Direccion("Juan b Justo", 1004));
 			
-			int direccionBorrada2 = Delete.delete(con, Direccion.class, "calle=?", "Juan b Justo");
-			if (direccionBorrada == 0) {
-				System.out.println("Error: Objetos " + nueva + " no eliminados!!");
-			} else {
-				System.out.println(direccionBorrada2 + " Objetos con xql eliminados");
-			}
+//			//insert ---
+//			Direccion nueva = new Direccion("Rivadavia", 700);
+//			int direccionId = Insert.insert(con, nueva);
+//			System.out.println("Objeto creado : " + nueva);
+//			
+//			//delete por id---
+//			int direccionBorrada = Delete.delete(con, Direccion.class, direccionId);
+//			if (direccionBorrada == 0) {
+//				System.out.println("Error: Objeto " + nueva + " no eliminado!!");
+//			} else {
+//				System.out.println("Objeto " + nueva + " eliminado");
+//			}
+//
+//			//deletes por xql---
+//			Insert.insert(con, new Direccion("Juan b Justo", 700));
+//			Insert.insert(con, new Direccion("Juan b Justo", 1000));
+//			Insert.insert(con, new Direccion("Juan b Justo", 1004));
+//			
+//			int direccionBorrada2 = Delete.delete(con, Direccion.class, "calle=?", "Juan b Justo");
+//			if (direccionBorrada == 0) {
+//				System.out.println("Error: Objetos " + nueva + " no eliminados!!");
+//			} else {
+//				System.out.println(direccionBorrada2 + " Objetos con xql eliminados");
+//			}
 			
 			
 			
