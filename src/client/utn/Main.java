@@ -23,9 +23,13 @@ public class Main {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, usr, pwd);
 
-			//findAll ---
-			for (Persona p : FindAll.findAll(con, Persona.class)) {
-				System.out.println(p);
+//			findAll ---
+//			for (Persona p : FindAll.findAll(con, Persona.class)) {
+//				System.out.println(p);
+//			}
+			
+			for (Dept dept : FindAll.findAll(con, Dept.class)) {
+				System.out.println(dept);
 			}
 			
 			System.exit(1);

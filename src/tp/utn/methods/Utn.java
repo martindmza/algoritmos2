@@ -13,6 +13,7 @@ import java.util.List;
 import com.mysql.jdbc.JDBC4PreparedStatement;
 
 import tp.utn.ann.Column;
+import tp.utn.ann.JoinColumn;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.OneToMany;
 import tp.utn.ann.Table;
@@ -59,14 +60,13 @@ public class Utn {
 	protected static <T> String _query(Class<T> dtoClass, String xql) {
 		Table table = dtoClass.getAnnotation(Table.class);
 		String tableName = table.name();
-		String alias = getAlias(dtoClass);
 		
 		String tableFields = "";
 		String joins = "";
 		for (Field f : dtoClass.getDeclaredFields()) {
 			if (f.getAnnotation(Column.class) != null) {
 				Column column = f.getAnnotation(Column.class);
-				tableFields += alias + "." + column.name() + ",";
+				tableFields += getAlias(dtoClass) + "." + column.name() + ",";
 			} else if (f.getAnnotation(ManyToOne.class) != null ) {
 				//join
 				ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
@@ -76,6 +76,16 @@ public class Utn {
 				
 				//select field
 				tableFields += getClassFieldsNames(manyToOneColumn.type());
+			} else if (f.getAnnotation(OneToMany.class) != null) {
+				//join
+				OneToMany oneToManyColumn = f.getAnnotation(OneToMany.class);
+				JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);				
+				String targetAlias = getAlias(oneToManyColumn.type());
+				PrimitiveField idColumn = FieldsTypesFactory.getIdAttribute(dtoClass);
+				joins += " " + join(dtoClass, oneToManyColumn.type(), targetAlias, idColumn.getColumnName(), joinColumn.name());
+				
+				//select field
+				tableFields += getClassFieldsNames(oneToManyColumn.type());
 			} else if (f.getAnnotation(OneToMany.class) != null) {
 				//join
 				
@@ -90,7 +100,7 @@ public class Utn {
 			where = "WHERE " + xql;
 		}
 
-		String sql = "SELECT " + tableFields + " FROM " + tableName + " AS " + alias + " " + joins + " " + where + ";";
+		String sql = "SELECT " + tableFields + " FROM " + tableName + " AS " + getAlias(dtoClass) + " " + joins + " " + where + ";";
 		System.out.println(sql);
 		System.exit(1);
 		return sql;

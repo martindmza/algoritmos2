@@ -5,6 +5,8 @@ import java.util.List;
 import tp.utn.ann.Column;
 import tp.utn.ann.Gui;
 import tp.utn.ann.Id;
+import tp.utn.ann.JoinColumn;
+import tp.utn.ann.OneToMany;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
 
@@ -22,7 +24,8 @@ public class Dept
 	@Column(name="loc")
 	private String loc;
 	
-	@Relation(type=Emp.class, att="dept")
+	@OneToMany(type=Emp.class, att="dept")
+	@JoinColumn(name="departamento_id")
 	private List<Emp> emps;
 	
 	public Integer getDeptno()
