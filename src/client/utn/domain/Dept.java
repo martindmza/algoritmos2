@@ -10,42 +10,42 @@ import tp.utn.ann.OneToMany;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
 
-@Table(name="dept", alias="d")
+@Table(name="department", alias="d")
 public class Dept 
 {
 	@Id(strategy=Id.ASSIGNED)
-	@Column(name="deptno")
+	@Column(name="id")
 	@Gui(editable=true)
-	private Integer deptno;
+	private Integer id;
 	
-	@Column(name="dname")
-	private String dname;
+	@Column(name="name")
+	private String name;
 	
 	@Column(name="loc")
 	private String loc;
 	
 	@OneToMany(type=Emp.class, att="dept")
-	@JoinColumn(name="departamento_id")
+	@JoinColumn(name="department_id")
 	private List<Emp> emps;
 	
-	public Integer getDeptno()
+	public Integer getId()
 	{ 
-		return deptno;
+		return id;
 	}
 
-	public void setDeptno(Integer deptno)
+	public void setId(Integer id)
 	{
-		this.deptno=deptno;
+		this.id=id;
 	}
 
-	public String getDname()
+	public String getName()
 	{
-		return dname;
+		return name;
 	}
 
-	public void setDname(String dname)
+	public void setName(String name)
 	{
-		this.dname=dname;
+		this.name=name;
 	}
 
 	public String getLoc()
@@ -61,7 +61,7 @@ public class Dept
 	@Override
 	public String toString()
 	{
-		return getDname();
+		return getName();
 	}
 
 	public List<Emp> getEmps()
@@ -76,7 +76,7 @@ public class Dept
 	
 	public boolean equals(Object o)
 	{
-		return ((Dept)o).getDeptno()==getDeptno();
+		return ((Dept)o).getId()==getId();
 				
 	}
 }

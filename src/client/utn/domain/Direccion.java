@@ -10,7 +10,7 @@ import tp.utn.ann.Table;
 public class Direccion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_direccion")
+	@Column(name="id")
 	private Integer idDireccion;
 
 	@Column(name="calle")

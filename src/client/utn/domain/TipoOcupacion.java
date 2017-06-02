@@ -8,7 +8,7 @@ import tp.utn.ann.Table;
 public class TipoOcupacion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_tipo_ocupacion")
+	@Column(name="id")
 	private Integer idTipoOcupacion;
 
 	@Column(name="descripcion")

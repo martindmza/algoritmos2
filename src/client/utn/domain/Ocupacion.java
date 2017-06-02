@@ -9,13 +9,13 @@ import tp.utn.ann.Table;
 public class Ocupacion
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_ocupacion")
+	@Column(name="id")
 	private Integer idOcupacion;
 	
 	@Column(name="descripcion")
 	private String descripcion;
 
-	@ManyToOne(type=TipoOcupacion.class, name="id_tipoocupacion")
+	@ManyToOne(type=TipoOcupacion.class, name="id_tipo_ocupacion")
 	public TipoOcupacion tipoOcupacion;
 	
 	public Integer getIdOcupacion()

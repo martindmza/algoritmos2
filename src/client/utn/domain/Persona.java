@@ -8,7 +8,7 @@ import tp.utn.ann.Table;
 public class Persona
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="id_persona")
+	@Column(name="id")
 	private Integer idPersona;
 	
 	@Column(name="nombre")

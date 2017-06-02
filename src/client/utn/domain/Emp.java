@@ -6,40 +6,40 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Table;
 
-@Table(name="emp")
+@Table(name="employee",alias="emp")
 public class Emp
 {
 	@Id(strategy=Id.IDENTITY)
-	@Column(name="empno")
-	private int empno;
+	@Column(name="id")
+	private int id;
 	
-	@Column(name="ename")
-	private String ename;
+	@Column(name="name")
+	private String name;
 	
-	@Column(name="hiredate")
+	@Column(name="hired_date")
 	private Date hiredate;
 
-	@Column(name="deptno")
+	@Column(name="department_id")
 	private Dept dept;
 
-	public int getEmpno()
-	{
-		return empno;
+	public Integer getId()
+	{ 
+		return id;
 	}
 
-	public void setEmpno(int empno)
+	public void setId(Integer id)
 	{
-		this.empno=empno;
+		this.id=id;
 	}
 
-	public String getEname()
+	public String getName()
 	{
-		return ename;
+		return name;
 	}
 
-	public void setEname(String ename)
+	public void setName(String name)
 	{
-		this.ename=ename;
+		this.name=name;
 	}
 
 	public Date getHiredate()
@@ -69,18 +69,18 @@ public class Emp
 		System.out.println("yo = "+this);
 		System.out.println(" o = "+o);
 		
-		if( empno==o.getEmpno() )
+		if( id==o.getId() )
 		{
 			System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
 		}
 		
 		
-		return (empno==o.getEmpno());//&&o.ename.equals(ename)&&o.hiredate.equals(hiredate);
+		return (id==o.getId());//&&o.ename.equals(ename)&&o.hiredate.equals(hiredate);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Emp [empno="+empno+", ename="+ename+", hiredate="+hiredate+", "+dept+"]";
+		return "Emp [empno="+id+", ename="+name+", hiredate="+hiredate+", "+dept+"]";
 	}		
 }

@@ -18,11 +18,13 @@ public abstract class AbstractField {
 	protected Method setter;
 	protected Method getter;
 	protected String tableName;
+	protected String tableAlias;
 
-	public <T> AbstractField(Field attribute, String columnName, Class<T> dtoClass) {
+	public <T> AbstractField(Field attribute, String columnName, Class<T> dtoClass, String tableAlias) {
 		this.attribute = attribute;
 		this.columnName = columnName;
 		this.tableName = dtoClass.getAnnotation(Table.class).name();
+		this.tableAlias = tableAlias;
 
 		Method methods[] = dtoClass.getDeclaredMethods();
 
@@ -43,6 +45,22 @@ public abstract class AbstractField {
 				break;
 			}
 		}
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
+	public String getTableAlias() {
+		return tableAlias;
+	}
+
+	public void setTableAlias(String tableAlias) {
+		this.tableAlias = tableAlias;
 	}
 
 	public Field getAttribute() {

@@ -18,8 +18,8 @@ public class OneToManyField extends AbstractField {
 	protected String joinColumn;
 	protected PrimitiveField idField;
 
-	public <T> OneToManyField(Field attribute, Class<T> dtoClass, Class<?> relatedClass, PrimitiveField idField, String joinColumn) {
-		super(attribute, "", dtoClass);
+	public <T> OneToManyField(Field attribute, Class<T> dtoClass, String tableAlias, Class<?> relatedClass, PrimitiveField idField, String joinColumn) {
+		super(attribute, "", dtoClass, tableAlias);
 		this.relatedClass = relatedClass;
 		this.idField = idField;
 		this.joinColumn = joinColumn;
