@@ -6,10 +6,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import tp.utn.ann.Column;
-import tp.utn.ann.ManyToOne;
+import tp.utn.ann.Id;
 import tp.utn.ann.Table;
-import tp.utn.methods.Find;
 
 public abstract class AbstractField {
 
@@ -19,6 +17,7 @@ public abstract class AbstractField {
 	protected Method getter;
 	protected String tableName;
 	protected String tableAlias;
+	protected boolean isId;
 
 	public <T> AbstractField(Field attribute, String columnName, Class<T> dtoClass, String tableAlias) {
 		this.attribute = attribute;
@@ -45,6 +44,19 @@ public abstract class AbstractField {
 				break;
 			}
 		}
+		
+		Id idAttribute = attribute.getAnnotation(Id.class);
+		if (idAttribute == null) {
+			this.isId = false;
+		}
+	}
+
+	public boolean isId() {
+		return isId;
+	}
+
+	public void setId(boolean isId) {
+		this.isId = isId;
 	}
 
 	public String getTableName() {
@@ -96,6 +108,8 @@ public abstract class AbstractField {
 	}
 
 
-	public abstract Object getParamForSetter(ResultSet rs, Connection con) throws SQLException;
+	public Object getParamForSetter(ResultSet rs) throws SQLException {
+		return null;
+	}
 
 }

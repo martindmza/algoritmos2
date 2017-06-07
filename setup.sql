@@ -74,15 +74,3 @@ INSERT INTO employee VALUES (1,'martin-amaya'      ,'2014-02-02',3);
 INSERT INTO employee VALUES (2,'juan-baragli'      ,'2014-02-02',3);
 INSERT INTO employee VALUES (3,'estefania-devoto'  ,'2016-02-02',1);
 INSERT INTO employee VALUES (4,'melisa-nose'       ,'2005-02-02',2);
-
-
-	-- @Column(name="id")
-	-- private int id;
-	
-	-- @Column(name="name")
-	-- private String name;
-	
-	-- @Column(name="hired_date")
-	-- private Date hiredate;
-
-	-- @Column(name="department_id")

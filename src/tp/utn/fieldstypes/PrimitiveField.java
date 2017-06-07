@@ -1,7 +1,6 @@
 package tp.utn.fieldstypes;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -12,7 +11,7 @@ public class PrimitiveField extends AbstractField {
 	}
 
 	@Override
-	public Object getParamForSetter(ResultSet rs, Connection con) throws SQLException {
+	public Object getParamForSetter(ResultSet rs) throws SQLException {
 		String type = this.attribute.getType().getSimpleName();		
 		if (type.equals("Integer") || type.equals("int")) {
 			return rs.getInt(this.getColumnAliasName());

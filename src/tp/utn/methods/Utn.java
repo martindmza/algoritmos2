@@ -8,8 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.lang.reflect.Method;
 import tp.utn.JoinedElement;
 import tp.utn.ann.Column;
 import tp.utn.ann.JoinColumn;
@@ -28,7 +29,7 @@ import tp.utn.fieldstypes.PrimitiveField;
 
 public class Utn {
 
-	private static List<AbstractFieldsMapping> mappedFields = new ArrayList<AbstractFieldsMapping>();
+	private static List<AbstractFieldsMapping<?,?>> mappedFields = new ArrayList<AbstractFieldsMapping<?,?>>();
 
 	// Retorna: el SQL correspondiente a la clase dtoClass acotado por xql
 	protected static <T> String _query(Class<T> dtoClass, String xql) {
@@ -107,8 +108,7 @@ public class Utn {
 		String sql = _query(dtoClass, xql);
 		addAbstractFields(dtoClass);
 
-		PrimitiveField idAttribute = FieldsTypesFactory.getIdAttribute(dtoClass, getAlias(dtoClass));
-		List<T> result = new ArrayList<T>();
+		HashMap<Integer,T> result = new HashMap<>();
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
 		try {
@@ -130,17 +130,24 @@ public class Utn {
 			rs = pstm.executeQuery();
 			// System.out.println(((JDBC4PreparedStatement) pstm).asSql());
 
+			PrimitiveField idAttribute = FieldsTypesFactory.getIdAttribute(dtoClass, getAlias(dtoClass));
 			Constructor<T> ctor = dtoClass.getConstructor();
 			while (rs.next()) {
 				T mainEntity = (T) ctor.newInstance();
-				List<ObjectMappedRow<?>> entities = new ArrayList<>();
+				int id = (int) idAttribute.getParamForSetter(rs);
+				HashMap<String,ObjectMappedRow<?>> entities = new HashMap<>();
 				for (AbstractFieldsMapping<?, ?> mapping : mappedFields) {
 					if (mapping.getClassType().getSimpleName().equals(dtoClass.getSimpleName())) {
+						if (result.containsKey(id)) {
+							continue;
+						}
+						
 						for (AbstractField myField : mapping.getPrimitiveFields()) {
 							if (myField.getSetter() != null) {
-								myField.getSetter().invoke(mainEntity, myField.getParamForSetter(rs, con));
+								myField.getSetter().invoke(mainEntity, myField.getParamForSetter(rs));
 							}
 						}
+						entities.put(dtoClass.getSimpleName(),new ObjectMappedRow<Object>(mainEntity, mapping));
 						continue;
 					}
 
@@ -148,25 +155,20 @@ public class Utn {
 					Object joinedEntity = joinCtor.newInstance();
 					for (AbstractField myField : mapping.getPrimitiveFields()) {
 						if (myField.getSetter() != null) {
-							myField.getSetter().invoke(joinedEntity, myField.getParamForSetter(rs, con));
+							myField.getSetter().invoke(joinedEntity, myField.getParamForSetter(rs));
 						}
 					}
-					entities.add(new ObjectMappedRow<Object>(joinedEntity, mapping));
+					entities.put(mapping.getClassType().getSimpleName(),new ObjectMappedRow<Object>(joinedEntity, mapping));
 				}
-
-				for (ObjectMappedRow entity : entities) {
-					if (entity.getAbstractField().getContainerClass() != null) {
-						for (ObjectMappedRow containerEntity : entities) {
-							if (entity.getAbstractField().getContainerClass().isInstance(containerEntity.getEntity())) {
-								containerEntity.getAbstractField().getContainerClassField().getSetter()
-										.invoke(containerEntity, entity);
-							}
-							break;
-						}
+				
+				for (HashMap.Entry<String, ObjectMappedRow<?>> entity : entities.entrySet()) {
+					if (entity.getValue().getAbstractField().getContainerClass() != null) {
+						ObjectMappedRow<?> containerEntity = entities.get(entity.getValue().getAbstractField().getContainerClass().getSimpleName());
+						Method setter = entity.getValue().getAbstractField().getContainerClassField().getSetter();
+						setter.invoke(containerEntity.getEntity(), entity.getValue().getEntity());
 					}
 				}
-
-				result.add(mainEntity);
+				result.put(id,mainEntity);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,7 +178,11 @@ public class Utn {
 			throw new RuntimeException(e);
 		}
 
-		return (List<T>) result;
+		List<T> resultList = new ArrayList<T>();
+		for (HashMap.Entry<Integer,T> resultEntity : result.entrySet()) {
+			resultList.add(resultEntity.getValue());
+		}
+		return resultList;
 	}
 
 	private static <T> String getAlias(Class<T> dtoClass) {
@@ -211,7 +217,7 @@ public class Utn {
 				ManyToOne manyToOneColumn = f.getAnnotation(ManyToOne.class);
 				PrimitiveField subJoinTargetId = FieldsTypesFactory.getIdAttribute(manyToOneColumn.type(), alias);
 				String targetSubJoinAlias = getAlias(manyToOneColumn.type());
-				ManyToOneField manyToOneField = (ManyToOneField) FieldsTypesFactory.buildfieldType(f, dtoClass,
+				ManyToOneField manyToOneField = (ManyToOneField) FieldsTypesFactory.buildfieldType(f, dtoTargetClass,
 						getAlias(dtoClass));
 				
 				JoinedElement joinedElement = join(dtoTargetClass, manyToOneColumn.type(), targetSubJoinAlias,
@@ -222,18 +228,6 @@ public class Utn {
 		}
 
 		return new JoinedElement(join, tableFields);
-	}
-
-	protected static <T> String getClassFieldsNames(Class<T> dtoClass) {
-		String alias = getAlias(dtoClass);
-		String tableFields = "";
-		for (Field f : dtoClass.getDeclaredFields()) {
-			if (f.getAnnotation(Column.class) != null) {
-				Column column = f.getAnnotation(Column.class);
-				tableFields += alias + "." + column.name() + " AS '" + alias + "." + column.name() + "' ,";
-			}
-		}
-		return tableFields;
 	}
 
 	private static <T> void addAbstractFields(Class<T> dtoClass) {
