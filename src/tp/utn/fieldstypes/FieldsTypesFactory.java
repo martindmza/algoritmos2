@@ -15,7 +15,7 @@ public class FieldsTypesFactory {
 			return new PrimitiveField(f, column.name(), dtoClass, tableAlias);
 		} else if (f.getAnnotation(ManyToOne.class) != null) {
 			ManyToOne manyToOneAttr = f.getAnnotation(ManyToOne.class);
-			return new ManyToOneField(f, manyToOneAttr.name(), dtoClass, tableAlias);
+			return new ManyToOneField(f, manyToOneAttr, dtoClass, tableAlias);
 		} else if (f.getAnnotation(OneToMany.class) != null) {
 			OneToMany oneToManyAttr = f.getAnnotation(OneToMany.class);
 			JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);

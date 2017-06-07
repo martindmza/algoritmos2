@@ -10,18 +10,18 @@ import tp.utn.methods.Find;
 
 public class ManyToOneField extends AbstractField {
 
-	public <T> ManyToOneField(Field attribute, String columnName, Class<T> dtoClass, String tableAlias) {
-		super(attribute, columnName, dtoClass, tableAlias);
+	public <T> ManyToOneField(Field attribute, ManyToOne manyToOneColumn, Class<T> dtoClass, String tableAlias) {
+		super(attribute, manyToOneColumn.name(), dtoClass, tableAlias);
 	}
-
+	
 	@Override
 	public Object getParamForSetter(ResultSet rs, Connection con) throws SQLException {
 		return null;
-//		ManyToOne manyToOne = this.attribute.getAnnotation(ManyToOne.class);
-//		Integer idColumn = rs.getInt(this.columnName);
-//
-//		Object relationObject = Find.find(con, manyToOne.type(), idColumn);
-//		return relationObject;
+		// ManyToOne manyToOne = this.attribute.getAnnotation(ManyToOne.class);
+		// Integer idColumn = rs.getInt(this.columnName);
+		//
+		// Object relationObject = Find.find(con, manyToOne.type(), idColumn);
+		// return relationObject;
 	}
 
 }
