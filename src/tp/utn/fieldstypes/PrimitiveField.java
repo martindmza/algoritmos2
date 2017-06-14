@@ -19,8 +19,11 @@ public class PrimitiveField extends AbstractField {
 			return rs.getString(this.getColumnAliasName());
 		} else if (type.equals("Boolean") || type.equals("boolean")) {
 			return rs.getBoolean(this.getColumnAliasName());
+		} else if (type.equals("Date")) {
+			return rs.getDate(this.getColumnAliasName());
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	private String getColumnAliasName() {

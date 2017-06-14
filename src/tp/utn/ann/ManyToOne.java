@@ -13,5 +13,5 @@ public @interface ManyToOne {
 	
 	Class<?> type();
 	String att() default NONE;
-	String name();
+	String name() default "";
 }

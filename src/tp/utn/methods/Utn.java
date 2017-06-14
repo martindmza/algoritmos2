@@ -29,7 +29,7 @@ import tp.utn.fieldstypes.PrimitiveField;
 
 public class Utn {
 
-	private static List<AbstractFieldsMapping<?,?>> mappedFields = new ArrayList<AbstractFieldsMapping<?,?>>();
+	private static List<AbstractFieldsMapping<?, ?>> mappedFields = new ArrayList<AbstractFieldsMapping<?, ?>>();
 
 	// Retorna: el SQL correspondiente a la clase dtoClass acotado por xql
 	protected static <T> String _query(Class<T> dtoClass, String xql) {
@@ -58,41 +58,31 @@ public class Utn {
 				// select field
 				tableFields += joinedElement.fieldsPart;
 			} else if (f.getAnnotation(OneToMany.class) != null) {
-				// join
 				OneToMany oneToManyColumn = f.getAnnotation(OneToMany.class);
-				JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);
+				if (oneToManyColumn.fetchType() == OneToMany.LAZY) {
+					continue;
+				}
+				
+				AbstractField attField = FieldsTypesFactory.getAttribute(oneToManyColumn.type(), oneToManyColumn.att());
+
 				String targetAlias = getAlias(oneToManyColumn.type());
 				PrimitiveField idColumn = FieldsTypesFactory.getIdAttribute(dtoClass, targetAlias);
 				OneToManyField oneToManyField = (OneToManyField) FieldsTypesFactory.buildfieldType(f, dtoClass,
 						getAlias(dtoClass));
 
 				JoinedElement joinedElement = join(dtoClass, oneToManyColumn.type(), targetAlias,
-						idColumn.getColumnName(), joinColumn.name(), oneToManyField);
+						idColumn.getColumnName(), attField.getColumnName(), oneToManyField);
 				joins += " " + joinedElement.joinPart;
 
 				// select field
 				tableFields += joinedElement.fieldsPart;
-			} else if (f.getAnnotation(OneToOne.class) != null) {
-				// join
-				OneToOne OneToOneColumn = f.getAnnotation(OneToOne.class);
-				String targetAlias = getAlias(OneToOneColumn.type());
-				PrimitiveField targetId = FieldsTypesFactory.getIdAttribute(OneToOneColumn.type(), targetAlias);
-				OneToOneField oneToOneField = (OneToOneField) FieldsTypesFactory.buildfieldType(f, dtoClass,
-						getAlias(dtoClass));
 
-				JoinedElement joinedElement = join(dtoClass, OneToOneColumn.type(), targetAlias, OneToOneColumn.name(),
-						targetId.getColumnName(), oneToOneField);
-				joins += " " + joinedElement;
-
-				// select field
-				tableFields += joinedElement.fieldsPart;
-			}
-
+			} 
 		}
 		tableFields = tableFields.substring(0, tableFields.length() - 1);
 		String where = "";
 		if (!xql.trim().equals("") && xql != null) {
-			where = "WHERE " + xql;
+			where = buildWhere(xql, dtoClass);
 		}
 
 		String sql = "SELECT " + tableFields + " FROM " + tableName + " AS " + getAlias(dtoClass) + " " + joins + " "
@@ -102,13 +92,23 @@ public class Utn {
 		return sql;
 	}
 
+	private static <T> String buildWhere(String xql, Class<T> dtoClass) {
+		for (char ch: xql.toCharArray()) {
+			if (ch == '$') {
+				
+			}
+			
+		}
+		return null;
+	}
+
 	// Invoca a: _query para obtener el SQL que se debe ejecutar
 	// Retorna: una lista de objetos de tipo T
 	public static <T> List<T> query(Connection con, Class<T> dtoClass, String xql, Object... args) {
 		String sql = _query(dtoClass, xql);
 		addAbstractFields(dtoClass);
 
-		HashMap<Integer,T> result = new HashMap<>();
+		HashMap<Integer, T> result = new HashMap<>();
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
 		try {
@@ -135,19 +135,19 @@ public class Utn {
 			while (rs.next()) {
 				T mainEntity = (T) ctor.newInstance();
 				int id = (int) idAttribute.getParamForSetter(rs);
-				HashMap<String,ObjectMappedRow<?>> entities = new HashMap<>();
+				HashMap<String, ObjectMappedRow<?>> entities = new HashMap<>();
 				for (AbstractFieldsMapping<?, ?> mapping : mappedFields) {
 					if (mapping.getClassType().getSimpleName().equals(dtoClass.getSimpleName())) {
 						if (result.containsKey(id)) {
 							continue;
 						}
-						
+
 						for (AbstractField myField : mapping.getPrimitiveFields()) {
 							if (myField.getSetter() != null) {
 								myField.getSetter().invoke(mainEntity, myField.getParamForSetter(rs));
 							}
 						}
-						entities.put(dtoClass.getSimpleName(),new ObjectMappedRow<Object>(mainEntity, mapping));
+						entities.put(dtoClass.getSimpleName(), new ObjectMappedRow<Object>(mainEntity, mapping));
 						continue;
 					}
 
@@ -158,17 +158,19 @@ public class Utn {
 							myField.getSetter().invoke(joinedEntity, myField.getParamForSetter(rs));
 						}
 					}
-					entities.put(mapping.getClassType().getSimpleName(),new ObjectMappedRow<Object>(joinedEntity, mapping));
+					entities.put(mapping.getClassType().getSimpleName(),
+							new ObjectMappedRow<Object>(joinedEntity, mapping));
 				}
-				
+
 				for (HashMap.Entry<String, ObjectMappedRow<?>> entity : entities.entrySet()) {
 					if (entity.getValue().getAbstractField().getContainerClass() != null) {
-						ObjectMappedRow<?> containerEntity = entities.get(entity.getValue().getAbstractField().getContainerClass().getSimpleName());
+						ObjectMappedRow<?> containerEntity = entities
+								.get(entity.getValue().getAbstractField().getContainerClass().getSimpleName());
 						Method setter = entity.getValue().getAbstractField().getContainerClassField().getSetter();
-						setter.invoke(containerEntity.getEntity(), entity.getValue().getEntity());
+ 						setter.invoke(containerEntity.getEntity(), entity.getValue().getEntity());
 					}
 				}
-				result.put(id,mainEntity);
+				result.put(id, mainEntity);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,10 +178,12 @@ public class Utn {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		} finally {
+			mappedFields.clear();
 		}
 
 		List<T> resultList = new ArrayList<T>();
-		for (HashMap.Entry<Integer,T> resultEntity : result.entrySet()) {
+		for (HashMap.Entry<Integer, T> resultEntity : result.entrySet()) {
 			resultList.add(resultEntity.getValue());
 		}
 		return resultList;
@@ -219,7 +223,7 @@ public class Utn {
 				String targetSubJoinAlias = getAlias(manyToOneColumn.type());
 				ManyToOneField manyToOneField = (ManyToOneField) FieldsTypesFactory.buildfieldType(f, dtoTargetClass,
 						getAlias(dtoClass));
-				
+
 				JoinedElement joinedElement = join(dtoTargetClass, manyToOneColumn.type(), targetSubJoinAlias,
 						manyToOneColumn.name(), subJoinTargetId.getColumnName(), manyToOneField);
 				join += " " + joinedElement.joinPart;
@@ -247,6 +251,7 @@ public class Utn {
 				primitiveFields.add((PrimitiveField) field);
 			}
 		}
+		
 		mappedFields.add(new AbstractFieldsMapping<T, C>(dtoClass, containerClass, primitiveFields, containerClassField,
 				containerAlias));
 	}

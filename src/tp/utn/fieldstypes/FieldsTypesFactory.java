@@ -1,11 +1,11 @@
 package tp.utn.fieldstypes;
 
 import java.lang.reflect.Field;
-import tp.utn.ann.Id;
-import tp.utn.ann.JoinColumn;
 import tp.utn.ann.Column;
+import tp.utn.ann.Id;
 import tp.utn.ann.ManyToOne;
 import tp.utn.ann.OneToMany;
+import tp.utn.ann.Relation;
 
 public class FieldsTypesFactory {
 
@@ -18,9 +18,10 @@ public class FieldsTypesFactory {
 			return new ManyToOneField(f, manyToOneAttr, dtoClass, tableAlias);
 		} else if (f.getAnnotation(OneToMany.class) != null) {
 			OneToMany oneToManyAttr = f.getAnnotation(OneToMany.class);
-			JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);
-			String joinColumnName = joinColumn.name(); 
-			return new OneToManyField(f, dtoClass, tableAlias, oneToManyAttr.type(), getIdAttribute(dtoClass, tableAlias), joinColumnName);
+			return new OneToManyField(f, dtoClass, tableAlias, oneToManyAttr.type(), getIdAttribute(dtoClass, tableAlias));
+		} else if (f.getAnnotation(Relation.class) != null) {
+			Relation an = f.getAnnotation(Relation.class);
+			return new RelationField(f, an.name() , dtoClass, tableAlias);
 		}
 		return null;
 	}
@@ -31,6 +32,15 @@ public class FieldsTypesFactory {
 			if (idAttribute != null) {
 				Column column = f.getAnnotation(Column.class);
 				return new PrimitiveField(f, column.name(), dtoClass, tableAlias);
+			}
+		}
+		return null;
+	}
+	
+	public static <T> AbstractField getAttribute (Class<T> dtoClass, String attributeName) {
+		for (Field f : dtoClass.getDeclaredFields()) {
+			if (f.getName().equals(attributeName)) {
+				return buildfieldType(f, dtoClass, null);
 			}
 		}
 		return null;

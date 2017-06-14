@@ -10,7 +10,7 @@ import tp.utn.ann.OneToMany;
 import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
 
-@Table(name="department", alias="d")
+@Table(name="department", alias="dept")
 public class Dept 
 {
 	@Id(strategy=Id.ASSIGNED)
@@ -24,8 +24,7 @@ public class Dept
 	@Column(name="loc")
 	private String loc;
 	
-	@OneToMany(type=Emp.class, att="dept")
-	@JoinColumn(name="department_id")
+	@OneToMany(type=Emp.class, att="dept", fetchType=OneToMany.LAZY)
 	private List<Emp> emps;
 	
 	public Integer getId()
@@ -61,7 +60,7 @@ public class Dept
 	@Override
 	public String toString()
 	{
-		return getName();
+		return "[" + getId() + " - " + getName() + " - " + getLoc() + "]";
 	}
 
 	public List<Emp> getEmps()

@@ -9,7 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OneToMany {
 	String NONE = "";
+	int LAZY=1;
+	int EAGER=2;
 	
+	int fetchType() default EAGER; 
 	Class<?> type();
 	String att() default NONE;
 }

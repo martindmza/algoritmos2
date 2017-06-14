@@ -51,7 +51,7 @@ public class Ocupacion
 	@Override
 	public String toString()
 	{
-		return getDescripcion();
+		return getDescripcion() + " (" + getTipoOcupacion().getDescripcion() + ")";
 	}
 
 	@Override

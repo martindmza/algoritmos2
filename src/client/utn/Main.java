@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import client.utn.domain.Dept;
+import client.utn.domain.Emp;
 import client.utn.domain.Persona;
 import tp.utn.methods.Find;
 import tp.utn.methods.FindAll;
@@ -23,27 +24,28 @@ public class Main {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, usr, pwd);
 
-			//findAll ---
-			for (Persona p : FindAll.findAll(con, Persona.class)) {
-				System.out.println(p);
-			}
+		//findAll ---
+//			System.out.println("Personas:");
+//			for (Persona p : FindAll.findAll(con, Persona.class)) {
+//				System.out.println(p);
+//			}
+//			
+//			System.out.println("Departamentos:");
+//			for (Dept dept : FindAll.findAll(con, Dept.class)) {
+//				System.out.println(dept);
+//			}
+//			
+//			System.out.println("Empleados:");
+//			for (Emp emp : FindAll.findAll(con, Emp.class)) {
+//				System.out.println(emp);
+//			}
 			
-			System.exit(1);
+		//find ---
 			
-			for (Dept dept : FindAll.findAll(con, Dept.class)) {
-				System.out.println(dept);
-			}
-			
-			
-			
-			//find ---
 			Persona p2 = Find.find(con, Persona.class, 2);
 			System.out.println(p2);
 			
-			//query ---
-			for (Persona p : Utn.query(con, Persona.class, "nombre LIKE '%a%'", args)) {
-				System.out.println(p + " encontrado con query");
-			}
+			System.exit(0);
 
 			
 			

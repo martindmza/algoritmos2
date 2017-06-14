@@ -4,6 +4,8 @@ import java.sql.Date;
 
 import tp.utn.ann.Column;
 import tp.utn.ann.Id;
+import tp.utn.ann.ManyToOne;
+import tp.utn.ann.Relation;
 import tp.utn.ann.Table;
 
 @Table(name="employee",alias="emp")
@@ -19,7 +21,7 @@ public class Emp
 	@Column(name="hired_date")
 	private Date hiredate;
 
-	@Column(name="department_id")
+	@ManyToOne(type=Dept.class, name="department_id")
 	private Dept dept;
 
 	public Integer getId()
