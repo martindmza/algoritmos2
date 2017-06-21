@@ -92,14 +92,45 @@ public class Utn {
 		return sql;
 	}
 
-	private static <T> String buildWhere(String xql, Class<T> dtoClass) {
+	protected static <T> String buildWhere(String xql, Class<T> dtoClass) {
+		List<String> vars = new ArrayList<String>();
+		boolean write = false;
+		String currentString = "";
 		for (char ch: xql.toCharArray()) {
 			if (ch == '$') {
-				
+				write = true;
+				continue;
+			}
+			if ((ch == ' ' || ch == '=') && write) {
+				write = false;
+				vars.add(currentString);
+				currentString = "";
 			}
 			
+			if (write) {
+				currentString += ch; 
+			}
 		}
-		return null;
+
+		for (String var : vars) {
+			String[] splited = var.split("\\.");
+			if (splited.length == 1) {
+				AbstractField field = FieldsTypesFactory.getAttribute(dtoClass, var);
+				xql = xql.replace("$" + var, getAlias(dtoClass) + "." + field.getColumnName());
+				continue;
+			}
+			
+			Class<?> dtoFilterClass = dtoClass;
+			for (int i = 0; i < splited.length ;i++) {
+				AbstractField field = FieldsTypesFactory.getAttribute(dtoFilterClass, splited[i]);
+				dtoFilterClass = field.getAttribute().getType();
+				if (i + 1 == splited.length) {
+					xql = xql.replace("$" + var, getAlias(field.getDtoContainerClass()) + "." + field.getColumnName());
+				}
+			}
+		}
+		
+		return " WHERE " + xql;
 	}
 
 	// Invoca a: _query para obtener el SQL que se debe ejecutar
@@ -189,7 +220,7 @@ public class Utn {
 		return resultList;
 	}
 
-	private static <T> String getAlias(Class<T> dtoClass) {
+	protected static <T> String getAlias(Class<T> dtoClass) {
 		Table table = dtoClass.getAnnotation(Table.class);
 		String tableName = table.name();
 		String alias = table.alias();

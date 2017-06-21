@@ -4,7 +4,7 @@ import tp.utn.ann.Column;
 import tp.utn.ann.Id;
 import tp.utn.ann.Table;
 
-@Table(name="tipo_ocupacion",alias="ton")
+@Table(name="tipo_ocupacion",alias="top")
 public class TipoOcupacion
 {
 	@Id(strategy=Id.IDENTITY)
@@ -13,6 +13,12 @@ public class TipoOcupacion
 
 	@Column(name="descripcion")
 	private String descripcion;
+	
+	public TipoOcupacion () {}
+	
+	public TipoOcupacion (String descripcion) {
+		this.descripcion = descripcion;
+	}
 	
 	public Integer getIdTipoOcupacion()
 	{

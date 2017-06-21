@@ -17,6 +17,8 @@ public abstract class AbstractField {
 	protected Method getter;
 	protected String tableName;
 	protected String tableAlias;
+	protected Class<?> dtoContainerClass;
+	
 	protected boolean isId;
 
 	public <T> AbstractField(Field attribute, String columnName, Class<T> dtoClass, String tableAlias) {
@@ -24,11 +26,13 @@ public abstract class AbstractField {
 		this.columnName = columnName;
 		this.tableName = dtoClass.getAnnotation(Table.class).name();
 		this.tableAlias = tableAlias;
+		this.dtoContainerClass = dtoClass;
 
 		Method methods[] = dtoClass.getDeclaredMethods();
 
 		// obtengo el metodo setter de este atributo
-		String setterName = "set" + attribute.getName().substring(0, 1).toUpperCase() + attribute.getName().substring(1);
+		String setterName = "set" + attribute.getName().substring(0, 1).toUpperCase()
+				+ attribute.getName().substring(1);
 		for (Method method : methods) {
 			if (method.getName().equals(setterName)) {
 				this.setter = method;
@@ -37,14 +41,15 @@ public abstract class AbstractField {
 		}
 
 		// obtengo el metodo getter de este atributo
-		String getterName = "get" + attribute.getName().substring(0, 1).toUpperCase() + attribute.getName().substring(1);
+		String getterName = "get" + attribute.getName().substring(0, 1).toUpperCase()
+				+ attribute.getName().substring(1);
 		for (Method method : methods) {
 			if (method.getName().equals(getterName)) {
 				this.getter = method;
 				break;
 			}
 		}
-		
+
 		Id idAttribute = attribute.getAnnotation(Id.class);
 		if (idAttribute == null) {
 			this.isId = false;
@@ -107,6 +112,9 @@ public abstract class AbstractField {
 		this.getter = getter;
 	}
 
+	public Class<?> getDtoContainerClass() {
+		return dtoContainerClass;
+	}
 
 	public Object getParamForSetter(ResultSet rs) throws SQLException {
 		return null;

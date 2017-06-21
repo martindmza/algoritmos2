@@ -22,6 +22,13 @@ public class Ocupacion
 	{
 		return idOcupacion;
 	}
+	
+	public Ocupacion () {}
+	
+	public Ocupacion (String descripcion, TipoOcupacion tipoOcupacion) {
+		this.descripcion = descripcion;
+		this.tipoOcupacion = tipoOcupacion;
+	}
 
 	public void setIdOcupacion(Integer idOcupacion)
 	{

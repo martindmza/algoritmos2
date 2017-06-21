@@ -22,6 +22,13 @@ public class Direccion
 	
 	@OneToMany(type=Persona.class,att="direccion", fetchType=OneToMany.LAZY)
 	private Collection<Persona> personas;
+	
+	public Direccion () {}
+	
+	public Direccion(String calle, int numero) {
+		this.calle = calle;
+		this.numero = numero;
+	}
 
 	public Collection<Persona> getPersonas()
 	{
